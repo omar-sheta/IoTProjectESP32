@@ -333,8 +333,15 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks
 void setup()
 {
   Serial.begin(115200);
+  lcd.init();
+  lcd.backlight();
+  lcd.print("Hi IoT");
+  delay(100);
+
   Serial.println("Starting Arduino BLE Client application...");
   BLEDevice::init("ESP32-BLE-Client");
+
+
 
   /* Retrieve a Scanner and set the callback we want to use to be informed when we
      have detected a new device.  Specify that we want active scanning and start the
@@ -357,7 +364,10 @@ void loop()
   if (doConnect == true)
   {
     if (connectToServer())
-    {
+    { 
+      lcd.clear();
+      lcd.print("BLE Connected");
+      delay(1000);
       Serial.println("We are now connected to the BLE Server.");
     } 
     else
@@ -374,11 +384,13 @@ void loop()
     std::string newValue = pRemoteCharacteristic->readValue();
     // String newValue = "Time since boot: " + String(millis()/2000);
     // Serial.println("Setting new characteristic value to \"" + newValue.c_str() + "\"");
-    lcd.begin();
-    lcd.clear();         
-    lcd.backlight();      // Make sure backlight is on
+    
+    lcd.clear();
+          // Make sure backlight is on
     Serial.println(newValue.c_str());
-    lcd.print("Temp: ")
+    lcd.setCursor(0,0);
+    lcd.print("Temp: ");
+    lcd.setCursor(7,0);
     lcd.print(newValue.c_str());
     
     /* Set the characteristic's value to be the array of bytes that is actually a string */
@@ -387,6 +399,8 @@ void loop()
   }
   else if(doScan)
   {
+    lcd.clear();
+    lcd.print("Searching ble");
     BLEDevice::getScan()->start(0);  // this is just example to start scan after disconnect, most likely there is better way to do it in arduino
   }
   
